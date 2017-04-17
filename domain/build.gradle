@@ -1,0 +1,17 @@
+ext {
+    rxJavaVersion = "2.0.8"
+    mockitoVersion = "1.4.0"
+}
+
+apply plugin: 'kotlin'
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    testCompile 'junit:junit:4.12'
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    compile "io.reactivex.rxjava2:rxjava:$rxJavaVersion"
+    testCompile "com.nhaarman:mockito-kotlin:$mockitoVersion"
+}
+
+sourceCompatibility = "1.7"
+targetCompatibility = "1.7"
