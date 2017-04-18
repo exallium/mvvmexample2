@@ -1,5 +1,7 @@
 ext {
     daggerVersion = "2.10"
+    appCompatVersion = "25.3.1"
+    rxBindingVersion = "2.0.0"
 }
 
 apply plugin: 'com.android.application'
@@ -30,16 +32,21 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile project(path: ':presentation')
+
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:25.3.1'
     testCompile 'junit:junit:4.12'
+
+    compile "com.android.support:appcompat-v7:$appCompatVersion"
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compile "com.google.dagger:dagger:$daggerVersion"
+    compile "com.android.support:design:$appCompatVersion"
+    compile "com.jakewharton.rxbinding2:rxbinding-kotlin:$rxBindingVersion"
+
     kapt "com.google.dagger:dagger-compiler:$daggerVersion"
-    compile project(path: ':presentation')
+    kapt "com.android.databinding:compiler:$android_gradle_version"
 }
 repositories {
     mavenCentral()

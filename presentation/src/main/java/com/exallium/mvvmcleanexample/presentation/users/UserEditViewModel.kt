@@ -43,7 +43,7 @@ class UserEditViewModel(private val userEditModel: UserEditModel,
     }
 
     private fun handleError(throwable: Throwable) {
-        router.displayMessage(throwable.message?:"")
+        router.displayError(throwable.message?:"")
         router.goBack()
     }
 
@@ -55,7 +55,10 @@ class UserEditViewModel(private val userEditModel: UserEditModel,
         when (result.action) {
             is ValidateUserFirstNameUseCase.Action -> firstNameError.set("")
             is ValidateUserLastNameUseCase.Action -> lastNameError.set("")
-            is SaveUserUseCase.Action -> router.goBack()
+            is SaveUserUseCase.Action -> {
+                router.displayMessage("Success")
+                router.goBack()
+            }
         }
     }
 
@@ -63,7 +66,7 @@ class UserEditViewModel(private val userEditModel: UserEditModel,
         when (result.action) {
             is ValidateUserFirstNameUseCase.Action -> firstNameError.set(result.throwable.message?:"")
             is ValidateUserLastNameUseCase.Action -> lastNameError.set(result.throwable.message?:"")
-            is SaveUserUseCase.Action -> router.displayMessage(result.throwable.message?:"Error")
+            is SaveUserUseCase.Action -> router.displayError(result.throwable.message?:"Error")
         }
     }
 

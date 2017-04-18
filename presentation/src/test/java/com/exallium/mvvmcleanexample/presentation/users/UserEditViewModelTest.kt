@@ -123,6 +123,7 @@ class UserEditViewModelTest {
         when_testSubjectInitialized()
 
         // THEN
+        verify(router).displayMessage(any())
         verify(router).goBack()
     }
 
@@ -161,7 +162,7 @@ class UserEditViewModelTest {
         when_testSubjectInitialized()
 
         // THEN
-        verify(router).displayMessage(ERR)
+        verify(router).displayError(ERR)
     }
 
     @Test
@@ -173,7 +174,7 @@ class UserEditViewModelTest {
         when_testSubjectInitialized()
 
         // THEN
-        verify(router).displayMessage(ERR)
+        verify(router).displayError(ERR)
         verify(router).goBack()
     }
 
