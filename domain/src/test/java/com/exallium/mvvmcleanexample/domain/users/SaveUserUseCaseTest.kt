@@ -90,7 +90,7 @@ class SaveUserUseCaseTest {
     }
 
     private fun given_invalidLastName() {
-        whenever(validateUserFirstNameUseCase.apply(any())).thenReturn(
+        whenever(validateUserLastNameUseCase.apply(any())).thenReturn(
                 Observable.just(SimpleResult.Failure(mock<ValidateUserLastNameUseCase.Action>(), mock())))
     }
 
@@ -100,7 +100,7 @@ class SaveUserUseCaseTest {
     }
 
     private fun given_validLastName() {
-        whenever(validateUserFirstNameUseCase.apply(any())).thenReturn(
+        whenever(validateUserLastNameUseCase.apply(any())).thenReturn(
                 Observable.just(SimpleResult.Success(mock<ValidateUserLastNameUseCase.Action>())))
     }
 

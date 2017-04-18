@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/MVVMCleanExample.iml" filepath="$PROJECT_DIR$/MVVMCleanExample.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/domain/domain.iml" filepath="$PROJECT_DIR$/domain/domain.iml" />
+      <module fileurl="file://$PROJECT_DIR$/mvvmexample2.iml" filepath="$PROJECT_DIR$/mvvmexample2.iml" />
       <module fileurl="file://$PROJECT_DIR$/presentation/presentation.iml" filepath="$PROJECT_DIR$/presentation/presentation.iml" />
     </modules>
   </component>
