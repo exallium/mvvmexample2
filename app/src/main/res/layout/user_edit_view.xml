@@ -23,8 +23,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/first_name"
-                android:onTextChanged="@{(text, s, b, c) -> viewModel.firstNameChanged(text)}"
-                android:text="@{viewModel.firstName}"/>
+                app:bindTextChanges="@{viewModel::setFirstNameChanged}" />
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
@@ -36,14 +35,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/last_name"
-                android:onTextChanged="@{(text, s, b, c) -> viewModel.lastNameChanged(text)}"
-                android:text="@{viewModel.lastName}"/>
+                app:bindTextChanges="@{viewModel::setLastNameChanged}" />
         </android.support.design.widget.TextInputLayout>
 
         <Button
+            app:bindClicks="@{viewModel::setSaveClicks}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="@{() -> viewModel.save()}"
             android:text="@string/save"/>
 
     </LinearLayout>

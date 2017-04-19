@@ -7,43 +7,40 @@ import com.exallium.mvvmcleanexample.domain.users.User
 import com.exallium.mvvmcleanexample.domain.users.ValidateUserFirstNameUseCase
 import com.exallium.mvvmcleanexample.domain.users.ValidateUserLastNameUseCase
 import com.exallium.mvvmcleanexample.presentation.nav.UiRouter
+import com.jakewharton.rxrelay2.BehaviorRelay
+import com.jakewharton.rxrelay2.PublishRelay
+import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.subjects.PublishSubject
 
-class UserEditViewModel(private val userEditModel: UserEditModel,
+class UserEditViewModel(userEditModel: UserEditModel,
                         private val router: UiRouter) {
 
-    val firstName = ObservableField<String>("")
     val firstNameError = ObservableField<String>("")
-    val lastName = ObservableField<String>("")
     val lastNameError = ObservableField<String>("")
 
     private val compositeDisposable = CompositeDisposable()
 
-    private val clickSubject = PublishSubject.create<User>()
-    private val firstNameSubject = PublishSubject.create<String>()
-    private val lastNameSubject = PublishSubject.create<String>()
+    private val clickRelay = PublishRelay.create<User>()
+    private val firstNameRelay = BehaviorRelay.create<String>()
+    private val lastNameRelay = BehaviorRelay.create<String>()
 
     init {
-        userEditModel.results(
-                clickSubject,
-                firstNameSubject.distinctUntilChanged(),
-                lastNameSubject.distinctUntilChanged()
-        ).subscribe(this::handleResult, this::handleError)
+        compositeDisposable.add(userEditModel.results(clickRelay, firstNameRelay, lastNameRelay)
+                .subscribe(this::handleResult, this::handleError))
     }
 
-    fun save() {
-        clickSubject.onNext(User(firstName.get(), lastName.get()))
+    fun setSaveClicks(obs: Observable<Unit>) {
+        compositeDisposable.add(obs
+                .map { User(firstNameRelay.value, lastNameRelay.value) }
+                .subscribe(clickRelay))
     }
 
-    fun firstNameChanged(text: CharSequence) {
-        firstName.set(text.toString())
-        firstNameSubject.onNext(text.toString())
+    fun setFirstNameChanged(obs: Observable<String>) {
+        compositeDisposable.add(obs.subscribe(firstNameRelay))
     }
 
-    fun lastNameChanged(text: CharSequence) {
-        lastName.set(text.toString())
-        lastNameSubject.onNext(text.toString())
+    fun setLastNameChanged(obs: Observable<String>) {
+        compositeDisposable.add(obs.subscribe(lastNameRelay))
     }
 
     fun cancel() {

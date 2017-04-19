@@ -14,8 +14,6 @@ import com.exallium.mvvmcleanexample.app.users.di.DaggerUserEditComponent
 import com.exallium.mvvmcleanexample.app.users.di.UserEditModule
 import com.exallium.mvvmcleanexample.databinding.UserEditViewBinding
 import com.exallium.mvvmcleanexample.presentation.users.UserEditViewModel
-import com.jakewharton.rxbinding2.view.clicks
-import com.jakewharton.rxbinding2.widget.textChanges
 import io.reactivex.disposables.CompositeDisposable
 import javax.inject.Inject
 
