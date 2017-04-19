@@ -3,13 +3,10 @@ ext {
 }
 
 buildscript {
-    ext.kotlin_version = '1.1.2-eap-73'
-    ext.android_gradle_version = '2.4.0-alpha6'
+    ext.kotlin_version = '1.1.1'
+    ext.android_gradle_version = '2.3.1'
     repositories {
         jcenter()
-        maven {
-            url("https://dl.bintray.com/kotlin/kotlin-eap-1.1")
-        }
     }
     dependencies {
         classpath "com.android.tools.build:gradle:$android_gradle_version"
@@ -23,9 +20,6 @@ buildscript {
 allprojects {
     repositories {
         jcenter()
-        maven {
-            url("https://dl.bintray.com/kotlin/kotlin-eap-1.1")
-        }
     }
 }
 
