@@ -1,15 +1,14 @@
 package com.exallium.mvvmcleanexample.presentation.users
 
 import android.databinding.ObservableField
-import com.exallium.mvvmcleanexample.domain.actions.SimpleResult
-import com.exallium.mvvmcleanexample.domain.actions.UseCaseResult
+import com.exallium.mvvmcleanexample.domain.UseCaseResult
 import com.exallium.mvvmcleanexample.domain.users.SaveUserUseCase
 import com.exallium.mvvmcleanexample.domain.users.User
 import com.exallium.mvvmcleanexample.domain.users.ValidateUserFirstNameUseCase
 import com.exallium.mvvmcleanexample.domain.users.ValidateUserLastNameUseCase
 import com.exallium.mvvmcleanexample.presentation.nav.UiRouter
-import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.subjects.PublishSubject
 
 class UserEditViewModel(private val userEditModel: UserEditModel,
                         private val router: UiRouter) {
@@ -21,13 +20,30 @@ class UserEditViewModel(private val userEditModel: UserEditModel,
 
     private val compositeDisposable = CompositeDisposable()
 
-    fun initializeStream(saveClicks: Observable<Unit>,
-                         firstNameChanges: Observable<CharSequence>,
-                         lastNameChanges: Observable<CharSequence>) {
-        userEditModel.results(saveClicks.map { User(firstName.get(), lastName.get()) },
-                firstNameChanges.map(CharSequence::toString),
-                lastNameChanges.map(CharSequence::toString))
-                .subscribe(this::handleResult, this::handleError)
+    private val clickSubject = PublishSubject.create<User>()
+    private val firstNameSubject = PublishSubject.create<String>()
+    private val lastNameSubject = PublishSubject.create<String>()
+
+    init {
+        userEditModel.results(
+                clickSubject,
+                firstNameSubject.distinctUntilChanged(),
+                lastNameSubject.distinctUntilChanged()
+        ).subscribe(this::handleResult, this::handleError)
+    }
+
+    fun save() {
+        clickSubject.onNext(User(firstName.get(), lastName.get()))
+    }
+
+    fun firstNameChanged(text: CharSequence) {
+        firstName.set(text.toString())
+        firstNameSubject.onNext(text.toString())
+    }
+
+    fun lastNameChanged(text: CharSequence) {
+        lastName.set(text.toString())
+        lastNameSubject.onNext(text.toString())
     }
 
     fun cancel() {
@@ -36,9 +52,22 @@ class UserEditViewModel(private val userEditModel: UserEditModel,
 
     private fun handleResult(useCaseResult: UseCaseResult) {
         when (useCaseResult) {
-            is SimpleResult.InProgress -> handleInProgress(useCaseResult)
-            is SimpleResult.Success -> handleSuccess(useCaseResult)
-            is SimpleResult.Failure -> handleFailure(useCaseResult)
+            is ValidateUserFirstNameUseCase.Result.InProgress -> handleInProgress()
+            is ValidateUserFirstNameUseCase.Result.Success -> firstNameError.set("")
+            is ValidateUserFirstNameUseCase.Result.Failure -> firstNameError.set(useCaseResult.message)
+
+            is ValidateUserLastNameUseCase.Result.InProgress -> handleInProgress()
+            is ValidateUserLastNameUseCase.Result.Success -> lastNameError.set("")
+            is ValidateUserLastNameUseCase.Result.Failure -> lastNameError.set(useCaseResult.message)
+
+            is SaveUserUseCase.Result.InProgress -> handleInProgress()
+            is SaveUserUseCase.Result.Success -> {
+                router.displayMessage("Success")
+                router.goBack()
+            }
+            is SaveUserUseCase.Result.Failure -> {
+                router.displayError(useCaseResult.message)
+            }
         }
     }
 
@@ -47,27 +76,7 @@ class UserEditViewModel(private val userEditModel: UserEditModel,
         router.goBack()
     }
 
-    private fun handleInProgress(result: SimpleResult.InProgress) {
+    private fun handleInProgress() {
         // TODO
     }
-
-    private fun handleSuccess(result: SimpleResult.Success) {
-        when (result.action) {
-            is ValidateUserFirstNameUseCase.Action -> firstNameError.set("")
-            is ValidateUserLastNameUseCase.Action -> lastNameError.set("")
-            is SaveUserUseCase.Action -> {
-                router.displayMessage("Success")
-                router.goBack()
-            }
-        }
-    }
-
-    private fun handleFailure(result: SimpleResult.Failure) {
-        when (result.action) {
-            is ValidateUserFirstNameUseCase.Action -> firstNameError.set(result.throwable.message?:"")
-            is ValidateUserLastNameUseCase.Action -> lastNameError.set(result.throwable.message?:"")
-            is SaveUserUseCase.Action -> router.displayError(result.throwable.message?:"Error")
-        }
-    }
-
 }

@@ -42,17 +42,11 @@ class UserEditView : AppCompatActivity() {
 
         binding.viewModel = viewModel
 
-        viewModel.initializeStream(
-                binding.save.clicks(),
-                binding.firstName.textChanges(),
-                binding.lastName.textChanges()
-        )
-
         router.transitions().subscribe {
             when (it) {
                 is AppRouter.Transition.GoBack -> onBackPressed()
                 is AppRouter.Transition.DisplayMessage -> displayMessage(it.message)
-                is AppRouter.Transition.DisplayError -> displayError(binding.save, it.message)
+                is AppRouter.Transition.DisplayError -> displayError(binding.root, it.message)
             }
         }
     }
