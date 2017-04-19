@@ -1,9 +1,7 @@
 package com.exallium.mvvmcleanexample.domain.users
 
-import com.exallium.mvvmcleanexample.domain.actions.SimpleResult
-import com.exallium.mvvmcleanexample.domain.actions.UseCaseResult
+import com.exallium.mvvmcleanexample.domain.UseCaseResult
 import com.nhaarman.mockito_kotlin.any
-import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
 import io.reactivex.Observable
 import io.reactivex.observers.TestObserver
@@ -14,6 +12,10 @@ import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 
 class SaveUserUseCaseTest {
+
+    companion object {
+        val ERR = "asdf"
+    }
 
     @InjectMocks
     lateinit var testSubject : SaveUserUseCase
@@ -86,39 +88,39 @@ class SaveUserUseCaseTest {
 
     private fun given_invalidFirstName() {
         whenever(validateUserFirstNameUseCase.apply(any())).thenReturn(
-                Observable.just(SimpleResult.Failure(mock<ValidateUserFirstNameUseCase.Action>(), mock())))
+                Observable.just(ValidateUserFirstNameUseCase.Result.Failure(ERR)))
     }
 
     private fun given_invalidLastName() {
         whenever(validateUserLastNameUseCase.apply(any())).thenReturn(
-                Observable.just(SimpleResult.Failure(mock<ValidateUserLastNameUseCase.Action>(), mock())))
+                Observable.just(ValidateUserLastNameUseCase.Result.Failure(ERR)))
     }
 
     private fun given_validFirstName() {
         whenever(validateUserFirstNameUseCase.apply(any())).thenReturn(
-                Observable.just(SimpleResult.Success(mock<ValidateUserFirstNameUseCase.Action>())))
+                Observable.just(ValidateUserFirstNameUseCase.Result.Success()))
     }
 
     private fun given_validLastName() {
         whenever(validateUserLastNameUseCase.apply(any())).thenReturn(
-                Observable.just(SimpleResult.Success(mock<ValidateUserLastNameUseCase.Action>())))
+                Observable.just(ValidateUserLastNameUseCase.Result.Success()))
     }
 
     private fun when_actionSubmit() {
-        Observable.just(SaveUserUseCase.Action(user))
+        Observable.just(user)
                 .compose(testSubject)
                 .subscribe(testObserver)
     }
 
     private fun then_firstIsInProgressSecondIsFailure() {
         testObserver.assertValueCount(2)
-        testObserver.assertValueAt(0) { it is SimpleResult.InProgress }
-        testObserver.assertValueAt(1) { it is SimpleResult.Failure }
+        testObserver.assertValueAt(0) { it is SaveUserUseCase.Result.InProgress }
+        testObserver.assertValueAt(1) { it is SaveUserUseCase.Result.Failure }
     }
 
     private fun then_firstIsInProgressSecondIsSuccess() {
         testObserver.assertValueCount(2)
-        testObserver.assertValueAt(0) { it is SimpleResult.InProgress }
-        testObserver.assertValueAt(1) { it is SimpleResult.Success }
+        testObserver.assertValueAt(0) { it is SaveUserUseCase.Result.InProgress }
+        testObserver.assertValueAt(1) { it is SaveUserUseCase.Result.Success }
     }
 }

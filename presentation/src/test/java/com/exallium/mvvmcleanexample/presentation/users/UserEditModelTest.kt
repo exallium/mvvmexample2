@@ -1,7 +1,6 @@
 package com.exallium.mvvmcleanexample.presentation.users
 
-import com.exallium.mvvmcleanexample.domain.actions.SimpleResult
-import com.exallium.mvvmcleanexample.domain.actions.UseCaseResult
+import com.exallium.mvvmcleanexample.domain.UseCaseResult
 import com.exallium.mvvmcleanexample.domain.users.SaveUserUseCase
 import com.exallium.mvvmcleanexample.domain.users.User
 import com.exallium.mvvmcleanexample.domain.users.ValidateUserFirstNameUseCase
@@ -41,9 +40,9 @@ class UserEditModelTest {
     @Before
     fun setUp() {
         MockitoAnnotations.initMocks(this)
-        whenever(saveUserUseCase.apply(any())).thenReturn(Observable.just(SimpleResult.InProgress(mock())))
-        whenever(validateUserFirstNameUseCase.apply(any())).thenReturn(Observable.just(SimpleResult.InProgress(mock())))
-        whenever(validateUserLastNameUseCase.apply(any())).thenReturn(Observable.just(SimpleResult.InProgress(mock())))
+        whenever(saveUserUseCase.apply(any())).thenReturn(Observable.just(SaveUserUseCase.Result.InProgress()))
+        whenever(validateUserFirstNameUseCase.apply(any())).thenReturn(Observable.just(ValidateUserFirstNameUseCase.Result.InProgress()))
+        whenever(validateUserLastNameUseCase.apply(any())).thenReturn(Observable.just(ValidateUserLastNameUseCase.Result.InProgress()))
     }
 
     @Test

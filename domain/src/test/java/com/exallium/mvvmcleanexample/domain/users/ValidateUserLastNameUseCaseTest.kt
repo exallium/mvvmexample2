@@ -1,7 +1,6 @@
 package com.exallium.mvvmcleanexample.domain.users
 
-import com.exallium.mvvmcleanexample.domain.actions.SimpleResult
-import com.exallium.mvvmcleanexample.domain.actions.UseCaseResult
+import com.exallium.mvvmcleanexample.domain.UseCaseResult
 import io.reactivex.Observable
 import io.reactivex.observers.TestObserver
 import org.junit.Test
@@ -15,26 +14,26 @@ class ValidateUserLastNameUseCaseTest {
     @Test
     fun apply_whenTextIsValid_inProgressThenSuccess() {
         // WHEN
-        Observable.just(ValidateUserLastNameUseCase.Action("lastName"))
+        Observable.just("lastName")
                 .compose(testSubject)
                 .subscribe(testObserver)
 
         // THEN
         testObserver.assertValueCount(2)
-        testObserver.assertValueAt(0) { it is SimpleResult.InProgress }
-        testObserver.assertValueAt(1) { it is SimpleResult.Success }
+        testObserver.assertValueAt(0) { it is ValidateUserLastNameUseCase.Result.InProgress }
+        testObserver.assertValueAt(1) { it is ValidateUserLastNameUseCase.Result.Success }
     }
 
     @Test
     fun apply_whenTextIsNotValid_inProgressThenFailure() {
         // WHEN
-        Observable.just(ValidateUserLastNameUseCase.Action(""))
+        Observable.just("")
                 .compose(testSubject)
                 .subscribe(testObserver)
 
         // THEN
         testObserver.assertValueCount(2)
-        testObserver.assertValueAt(0) { it is SimpleResult.InProgress }
-        testObserver.assertValueAt(1) { it is SimpleResult.Failure }
+        testObserver.assertValueAt(0) { it is ValidateUserLastNameUseCase.Result.InProgress }
+        testObserver.assertValueAt(1) { it is ValidateUserLastNameUseCase.Result.Failure }
     }
 }

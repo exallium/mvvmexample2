@@ -1,17 +1,18 @@
 package com.exallium.mvvmcleanexample.presentation.users
 
-import com.exallium.mvvmcleanexample.domain.actions.SimpleResult
-import com.exallium.mvvmcleanexample.domain.actions.UseCaseResult
+import com.exallium.mvvmcleanexample.domain.UseCaseResult
 import com.exallium.mvvmcleanexample.domain.users.SaveUserUseCase
 import com.exallium.mvvmcleanexample.domain.users.ValidateUserFirstNameUseCase
 import com.exallium.mvvmcleanexample.domain.users.ValidateUserLastNameUseCase
 import com.exallium.mvvmcleanexample.presentation.nav.UiRouter
-import com.nhaarman.mockito_kotlin.*
+import com.nhaarman.mockito_kotlin.any
+import com.nhaarman.mockito_kotlin.verify
+import com.nhaarman.mockito_kotlin.verifyZeroInteractions
+import com.nhaarman.mockito_kotlin.whenever
 import io.reactivex.Observable
 import io.reactivex.subjects.PublishSubject
 import org.junit.Before
 import org.junit.Test
-import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 
@@ -22,7 +23,6 @@ class UserEditViewModelTest {
         val EXCEPTION = Exception(ERR)
     }
 
-    @InjectMocks
     lateinit var testSubject: UserEditViewModel
 
     @Mock
@@ -53,33 +53,31 @@ class UserEditViewModelTest {
     @Test
     fun lastNameChange_inProgress_doesNothing() {
         // GIVEN
-        testSubject.lastNameError.set(ERR)
-        given_routerEmitsResult(SimpleResult.InProgress(ValidateUserLastNameUseCase.Action("")))
+        given_routerEmitsResult(ValidateUserLastNameUseCase.Result.InProgress())
 
         // WHEN
         when_testSubjectInitialized()
 
         // THEN
-        assert(ERR == testSubject.lastNameError.get())
+        assert(testSubject.lastNameError.get().isEmpty())
     }
 
     @Test
     fun firstNameChange_inProgress_doesNothing() {
         // GIVEN
-        testSubject.firstNameError.set(ERR)
-        given_routerEmitsResult(SimpleResult.InProgress(ValidateUserLastNameUseCase.Action("")))
+        given_routerEmitsResult(ValidateUserFirstNameUseCase.Result.InProgress())
 
         // WHEN
         when_testSubjectInitialized()
 
         // THEN
-        assert(ERR == testSubject.firstNameError.get())
+        assert(testSubject.firstNameError.get().isEmpty())
     }
 
     @Test
     fun userSave_inProgress_doesNothing() {
         // GIVEN
-        given_routerEmitsResult(SimpleResult.InProgress(SaveUserUseCase.Action(mock())))
+        given_routerEmitsResult(SaveUserUseCase.Result.InProgress())
 
         // WHEN
         when_testSubjectInitialized()
@@ -91,8 +89,7 @@ class UserEditViewModelTest {
     @Test
     fun lastNameChange_success_clearsError() {
         // GIVEN
-        testSubject.lastNameError.set(ERR)
-        given_routerEmitsResult(SimpleResult.Success(ValidateUserLastNameUseCase.Action("")))
+        given_routerEmitsResult(ValidateUserLastNameUseCase.Result.Success())
 
         // WHEN
         when_testSubjectInitialized()
@@ -104,8 +101,7 @@ class UserEditViewModelTest {
     @Test
     fun firstNameChange_success_clearsError() {
         // GIVEN
-        testSubject.firstNameError.set(ERR)
-        given_routerEmitsResult(SimpleResult.Success(ValidateUserFirstNameUseCase.Action("")))
+        given_routerEmitsResult(ValidateUserFirstNameUseCase.Result.Success())
 
         // WHEN
         when_testSubjectInitialized()
@@ -117,7 +113,7 @@ class UserEditViewModelTest {
     @Test
     fun userSave_success_routerGoesBack() {
         // GIVEN
-        given_routerEmitsResult(SimpleResult.Success(SaveUserUseCase.Action(mock())))
+        given_routerEmitsResult(SaveUserUseCase.Result.Success())
 
         // WHEN
         when_testSubjectInitialized()
@@ -130,8 +126,7 @@ class UserEditViewModelTest {
     @Test
     fun lastNameChange_failed_setsError() {
         // GIVEN
-        testSubject.lastNameError.set("")
-        given_routerEmitsResult(SimpleResult.Failure(ValidateUserLastNameUseCase.Action(""), EXCEPTION))
+        given_routerEmitsResult(ValidateUserLastNameUseCase.Result.Failure(ERR))
 
         // WHEN
         when_testSubjectInitialized()
@@ -143,8 +138,7 @@ class UserEditViewModelTest {
     @Test
     fun firstNameChange_failed_setsError() {
         // GIVEN
-        testSubject.firstNameError.set("")
-        given_routerEmitsResult(SimpleResult.Failure(ValidateUserFirstNameUseCase.Action(""), EXCEPTION))
+        given_routerEmitsResult(ValidateUserFirstNameUseCase.Result.Failure(ERR))
 
         // WHEN
         when_testSubjectInitialized()
@@ -156,7 +150,7 @@ class UserEditViewModelTest {
     @Test
     fun userSave_failed_routerDisplaysError() {
         // GIVEN
-        given_routerEmitsResult(SimpleResult.Failure(SaveUserUseCase.Action(mock()), EXCEPTION))
+        given_routerEmitsResult(SaveUserUseCase.Result.Failure(ERR))
 
         // WHEN
         when_testSubjectInitialized()
@@ -179,7 +173,7 @@ class UserEditViewModelTest {
     }
 
     private fun when_testSubjectInitialized() {
-        testSubject.initializeStream(saveClicks, firstNameChanges, lastNameChanges)
+        testSubject = UserEditViewModel(model, router)
     }
 
     private fun given_routerEmitsResult(useCaseResult: UseCaseResult) {
