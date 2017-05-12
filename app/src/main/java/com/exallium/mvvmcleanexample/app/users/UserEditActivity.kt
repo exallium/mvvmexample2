@@ -14,10 +14,11 @@ import com.exallium.mvvmcleanexample.app.users.di.DaggerUserEditComponent
 import com.exallium.mvvmcleanexample.app.users.di.UserEditModule
 import com.exallium.mvvmcleanexample.databinding.UserEditViewBinding
 import com.exallium.mvvmcleanexample.presentation.users.UserEditViewModel
-import io.reactivex.disposables.CompositeDisposable
+import com.exallium.mvvmcleanexample.presentation.utils.autoViewBinding
+import com.exallium.mvvmcleanexample.presentation.utils.disposable
 import javax.inject.Inject
 
-class UserEditView : AppCompatActivity() {
+class UserEditActivity : AppCompatActivity() {
 
     @Inject
     lateinit var viewModel: UserEditViewModel
@@ -25,12 +26,15 @@ class UserEditView : AppCompatActivity() {
     @Inject
     lateinit var router: AppRouter
 
-    val compositeDisposable = CompositeDisposable()
+    private var binding: UserEditViewBinding? by autoViewBinding<UserEditViewBinding>(null)
+    private var disposable by disposable(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val binding = DataBindingUtil.setContentView<UserEditViewBinding>(this, R.layout.user_edit_view)
+        binding = DataBindingUtil.setContentView<UserEditViewBinding>(this, R.layout.user_edit_view).also(this::init)
+    }
 
+    private fun init(binding: UserEditViewBinding) {
         DaggerUserEditComponent.builder()
                 .appComponent(App.component)
                 .domainUserModule(DomainUserModule())
@@ -40,19 +44,31 @@ class UserEditView : AppCompatActivity() {
 
         binding.viewModel = viewModel
 
-        router.transitions().subscribe {
-            when (it) {
-                is AppRouter.Transition.GoBack -> onBackPressed()
-                is AppRouter.Transition.DisplayMessage -> displayMessage(it.message)
-                is AppRouter.Transition.DisplayError -> displayError(binding.root, it.message)
-            }
+        router.transitions().subscribe(this::onNextTransition)
+    }
+
+    private fun onNextTransition(transition: AppRouter.Transition) {
+        when (transition) {
+            is AppRouter.Transition.GoBack -> finish()
+            is AppRouter.Transition.DisplayMessage -> displayMessage(transition.message)
+            is AppRouter.Transition.DisplayError -> displayError(binding!!.root, transition.message)
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        viewModel.start()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        viewModel.stop()
+    }
+
     override fun onDestroy() {
-        compositeDisposable.clear()
-        viewModel.cancel()
         super.onDestroy()
+        binding = null
+        disposable = null
     }
 
     private fun displayMessage(message: String) {
