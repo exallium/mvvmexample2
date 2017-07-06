@@ -1,5 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion 25
@@ -21,8 +22,10 @@ android {
         }
     }
 
-    dataBinding {
-        enabled = true
+    // This enables code generation for this module.
+    // needed to access data binding classes... can't figure out how to include it without this :/
+    dataBinding{
+        enabled true
     }
 }
 
@@ -37,6 +40,9 @@ dependencies {
     compile project(path: ':domain')
     compile "com.jakewharton.rxrelay2:rxrelay:2.0.0"
     testCompile "com.nhaarman:mockito-kotlin:$mockito_version"
+
+    // including this for now just to be consistent with app module
+    kapt "com.android.databinding:compiler:$android_gradle_version"
 }
 repositories {
     mavenCentral()
